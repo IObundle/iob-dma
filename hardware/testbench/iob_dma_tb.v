@@ -136,7 +136,7 @@ integer i;
 `define A_TO_B 0
 `define B_TO_A 1
 
-      direction = `B_TO_A;
+      direction = `A_TO_B;
 
       set_c_value(0,0); // Address
       set_c_value(2,10 * 4); // Bytes length
@@ -148,9 +148,9 @@ integer i;
       $display("============================\n");
 
       if(direction)
-         $display("A -> B\n");
-      else
          $display("A <- B\n");
+      else
+         $display("A -> B\n");
 
       $display("A\tB\n");
       for(i = 0; i < 10; i = i +1) begin
