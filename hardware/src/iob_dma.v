@@ -9,6 +9,8 @@
 `define DIRECTION 3
 `define RUN 4
 
+`define STATUS 0
+
 `define CONF_ADDR_W 1
 
 `define READ  0
@@ -25,31 +27,31 @@ module iob_dma
         parameter LEN_W = 0
     )(
         // Configuration Native Slave I/F
-        input                  c_valid,
-        input [ADDR_W-1:0]     c_addr,
-        input [DATA_W-1:0]     c_wdata,
-        input [DATA_W/8-1:0]   c_wstrb,
-        output [DATA_W-1:0]    c_rdata,
-        output reg             c_ready,
+        input                   c_valid,
+        input [ADDR_W-1:0]      c_addr,
+        input [DATA_W-1:0]      c_wdata,
+        input [DATA_W/8-1:0]    c_wstrb,
+        output reg [DATA_W-1:0] c_rdata,
+        output reg              c_ready,
 
         // Port A Master Native I/F
-        output [ADDR_W-1:0]    a_addr,
-        output                 a_valid,
-        output [DATA_W-1:0]    a_wdata,
-        output [DATA_W/8-1:0]  a_wstrb,
-        input [DATA_W-1:0]     a_rdata,
-        input                  a_ready,
+        output [ADDR_W-1:0]     a_addr,
+        output                  a_valid,
+        output [DATA_W-1:0]     a_wdata,
+        output [DATA_W/8-1:0]   a_wstrb,
+        input [DATA_W-1:0]      a_rdata,
+        input                   a_ready,
 
         // Port B Master Native I/F
-        output [ADDR_W-1:0]    b_addr,
-        output                 b_valid,
-        output [DATA_W-1:0]    b_wdata,
-        output [DATA_W/8-1:0]  b_wstrb,
-        input [DATA_W-1:0]     b_rdata,
-        input                  b_ready,
+        output [ADDR_W-1:0]     b_addr,
+        output                  b_valid,
+        output [DATA_W-1:0]     b_wdata,
+        output [DATA_W/8-1:0]   b_wstrb,
+        input [DATA_W-1:0]      b_rdata,
+        input                   b_ready,
 
-        input                  clk,
-        input                  rst
+        input                   clk,
+        input                   rst
     );
 
     // Configuration state
@@ -57,6 +59,8 @@ module iob_dma
     reg [LEN_W-1:0] length;
     reg direction;
     reg run;
+
+    wire running;
 
     // Configuration
     always @(posedge clk,posedge rst)
@@ -72,13 +76,19 @@ module iob_dma
             run <= 0;
             c_ready <= c_valid;
 
-            if(c_valid) begin
+            if(c_valid & |c_wstrb) begin
                 case(c_addr)
                     `ADDRESS_A: address_a <= c_wdata;
                     `ADDRESS_B: address_b <= c_wdata;
                     `LENGTH:    length    <= c_wdata;
                     `DIRECTION: direction <= c_wdata;
                     `RUN:       run       <= c_wdata;
+                endcase
+            end
+
+            if(c_valid & !(|c_wstrb)) begin
+                case(c_addr)
+                    `STATUS: c_rdata <= {31'h0,running};
                 endcase
             end
         end
@@ -110,6 +120,10 @@ module iob_dma
                     if(read_ready) begin
                         counter <= counter - 1;
                     end
+
+                    if(last & !running) begin
+                        state <= WAIT_RUN;
+                    end
                 end
             endcase
         end 
@@ -119,6 +133,10 @@ wire a_to_b_valid_in;
 wire a_to_b_valid_out;
 wire b_to_a_valid_in;
 wire b_to_a_valid_out;
+
+wire running_a_to_b,running_b_to_a;
+
+assign running = (running_a_to_b | running_b_to_a);
 
 master_to_master
     #(
@@ -137,6 +155,8 @@ master_to_master
 
         .start(run & (direction == `A_TO_B)),
         .last(last),
+
+        .running(running_a_to_b),
 
         .clk(clk),
         .rst(rst)
@@ -159,6 +179,8 @@ master_to_master
 
         .start(run & (direction == `B_TO_A)),
         .last(last),
+
+        .running(running_b_to_a),
 
         .clk(clk),
         .rst(rst)
@@ -255,6 +277,8 @@ module master_to_master
       input                     start,
       input                     last,
 
+      output                    running,
+
       input                     clk,
       input                     rst
    );
@@ -270,6 +294,8 @@ reg last_valid_out;
 
 reg runningRead;
 reg runningWrite;
+
+assign running = (runningRead | runningWrite);
 
 wire store_on_data = (1'b1);
 
@@ -312,6 +338,9 @@ begin
             if(ready_out) begin
                 data_valid <= 1'b0;
             end
+
+            if(!runningRead & !data_valid & !stored_data_valid)
+                runningWrite <= 1'b0;
         end
     end
 end

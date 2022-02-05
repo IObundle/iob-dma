@@ -61,6 +61,8 @@ simple_ram
       .rdata(a_rdata),
       .ready(a_ready),
 
+      .fixed_delay(0),
+
       .clk(clk),
       .rst(rst)
    );
@@ -79,6 +81,8 @@ simple_ram
       .rdata(b_rdata),
       .ready(b_ready),
 
+      .fixed_delay(0),
+
       .clk(clk),
       .rst(rst)
    );
@@ -93,6 +97,8 @@ wire [31:0] f_data;
 reg f_ready;
 wire f_valid;
 wire wr_read_en;
+
+reg [31:0] dma_status;
 
 reg direction;
 integer i;
@@ -143,7 +149,13 @@ integer i;
       set_c_value(3,direction); // Write
       set_c_value(4,1); // Run
 
-      repeat(100) @(posedge clk) #1;
+      dma_status = 1;
+      while(dma_status[0]) begin
+         get_c_value(0,dma_status);
+         @(posedge clk) #1;
+      end
+
+      repeat (5) @(posedge clk) #1;
 
       $display("============================\n");
 
@@ -176,6 +188,24 @@ integer i;
          c_wstrb = 0;
 
          @(posedge clk) #1;         
+      end
+   endtask 
+
+   task get_c_value(input [31:0] address, output [31:0] value);
+      begin
+         c_valid = 1;
+         c_addr = address;
+         c_wstrb = 4'h0;
+
+         while(!c_ready)
+            @(posedge clk) #1;
+
+         c_valid = 0;
+         c_addr = 0;
+         c_wdata = 0;
+         c_wstrb = 0;
+
+         value = c_rdata;      
       end
    endtask 
 
@@ -230,11 +260,23 @@ module simple_ram
       output reg [DATA_W-1:0] rdata,
       output reg              ready,
 
+      input [1:0]             fixed_delay,
+
       input                   clk,
       input                   rst
    );
 
 reg [31:0] mem [1023:0];
+reg [3:0] counter;
+
+reg seenRequest;
+
+reg [2:0] currentDelay;
+
+always @(posedge clk)
+begin
+   currentDelay = (fixed_delay + ($urandom % 2));
+end
 
 integer i;
 always @(posedge clk,posedge rst)
@@ -243,17 +285,35 @@ begin
       for(i = 0; i < 1024; i = i + 1)
          mem[i] <= 32'h0;
       rdata <= 0;
-      ready <= 0;
+      counter <= 0;
+      seenRequest <= 0;
    end else begin
       if(valid) begin
          if(|wstrb)
             mem[addr >> 2] <= wdata;
          else
             rdata <= mem[addr >> 2];
+
+         if(!seenRequest) begin
+            counter <= currentDelay;
+            seenRequest <= 1'b1;
+         end
       end
 
-      ready <= valid;
+      if(seenRequest)
+         if(counter != 0)
+            counter <= counter - 1;
+         else begin
+            seenRequest <= 1'b0;
+         end
    end
+end
+
+always @*
+begin
+   ready = 0;
+   if(seenRequest & counter == 0)
+      ready = 1;
 end
 
 endmodule
