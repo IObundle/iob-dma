@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Sat Feb  5 19:45:39 2022
+[*] Sun Feb  6 00:56:33 2022
 [*]
 [dumpfile] "/home/zettasticks/IOBundle/iob-soc-eth/submodules/ETHERNET/submodules/DMA/hardware/simulation/icarus/uut.vcd"
-[dumpfile_mtime] "Sat Feb  5 19:44:18 2022"
-[dumpfile_size] 20451
+[dumpfile_mtime] "Sun Feb  6 00:56:25 2022"
+[dumpfile_size] 1702132
 [savefile] "/home/zettasticks/IOBundle/iob-soc-eth/submodules/ETHERNET/submodules/DMA/hardware/simulation/waves.gtkw"
-[timestart] 58070000
+[timestart] 0
 [size] 1386 939
-[pos] 534 46
-*-23.000000 71910000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 692 42
+*-32.000000 65560000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] iob_dma_tb.
 [treeopen] iob_dma_tb.uut.
 [sst_width] 378
@@ -41,6 +41,9 @@ iob_dma_tb.a_rdata[31:0]
 @28
 iob_dma_tb.a_ready
 iob_dma_tb.a_valid
+@22
+iob_dma_tb.a_wdata[31:0]
+iob_dma_tb.a_wstrb[3:0]
 @200
 -B
 @22
@@ -68,7 +71,6 @@ iob_dma_tb.uut.a_to_b.ready_out
 iob_dma_tb.uut.a_to_b.runningRead
 iob_dma_tb.uut.a_to_b.runningWrite
 iob_dma_tb.uut.a_to_b.start
-iob_dma_tb.uut.a_to_b.store_on_data
 @22
 iob_dma_tb.uut.a_to_b.stored_data[31:0]
 @28
@@ -82,24 +84,23 @@ iob_dma_tb.uut.b_to_a.data[31:0]
 iob_dma_tb.uut.b_to_a.data_in[31:0]
 iob_dma_tb.uut.b_to_a.data_out[31:0]
 @28
-iob_dma_tb.uut.b_to_a.data_valid
+iob_dma_tb.uut.b_to_a.valid_out
 @29
-iob_dma_tb.uut.b_to_a.last
+iob_dma_tb.uut.b_to_a.data_valid
 @28
+iob_dma_tb.uut.b_to_a.ready_out
+iob_dma_tb.uut.b_to_a.stored_data_valid
+iob_dma_tb.uut.b_to_a.last
 iob_dma_tb.uut.b_to_a.last_valid_in
 iob_dma_tb.uut.b_to_a.last_valid_out
 iob_dma_tb.uut.b_to_a.ready_in
-iob_dma_tb.uut.b_to_a.ready_out
 iob_dma_tb.uut.b_to_a.runningRead
 iob_dma_tb.uut.b_to_a.runningWrite
 iob_dma_tb.uut.b_to_a.start
-iob_dma_tb.uut.b_to_a.store_on_data
 @22
 iob_dma_tb.uut.b_to_a.stored_data[31:0]
 @28
-iob_dma_tb.uut.b_to_a.stored_data_valid
 iob_dma_tb.uut.b_to_a.valid_in
-iob_dma_tb.uut.b_to_a.valid_out
 @200
 -ADDR_GEN
 @22
@@ -123,11 +124,6 @@ iob_dma_tb.uut.address_gen.write_wstrb[3:0]
 -RAM_A
 @22
 iob_dma_tb.ram_A.addr[23:0]
-iob_dma_tb.ram_A.counter[3:0]
-@28
-iob_dma_tb.ram_A.currentDelay[2:0]
-iob_dma_tb.ram_A.fixed_delay[1:0]
-@22
 iob_dma_tb.ram_A.rdata[31:0]
 @28
 iob_dma_tb.ram_A.ready

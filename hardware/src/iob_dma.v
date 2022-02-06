@@ -117,7 +117,7 @@ module iob_dma
                     end
                 end
                 START: begin
-                    if(read_ready) begin
+                    if(read_ready & !last) begin
                         counter <= counter - 1;
                     end
 
@@ -129,16 +129,16 @@ module iob_dma
         end 
     end
 
-wire a_to_b_valid_in;
-wire a_to_b_valid_out;
-wire b_to_a_valid_in;
-wire b_to_a_valid_out;
+    wire a_to_b_valid_in;
+    wire a_to_b_valid_out;
+    wire b_to_a_valid_in;
+    wire b_to_a_valid_out;
 
-wire running_a_to_b,running_b_to_a;
+    wire running_a_to_b,running_b_to_a;
 
-assign running = (running_a_to_b | running_b_to_a);
+    assign running = (running_a_to_b | running_b_to_a);
 
-master_to_master
+    master_to_master
     #(
         .DATA_W(DATA_W),
         .ADDR_W(ADDR_W)
@@ -147,11 +147,11 @@ master_to_master
     (
         .valid_in(a_to_b_valid_in),
         .data_in(a_rdata),
-        .ready_in(a_ready),
+        .ready_in(a_ready & (direction == `A_TO_B)),
 
         .valid_out(a_to_b_valid_out),
         .data_out(b_wdata),
-        .ready_out(b_ready),
+        .ready_out(b_ready & (direction == `A_TO_B)),
 
         .start(run & (direction == `A_TO_B)),
         .last(last),
@@ -162,7 +162,7 @@ master_to_master
         .rst(rst)
     );
 
-master_to_master
+    master_to_master
     #(
         .DATA_W(DATA_W),
         .ADDR_W(ADDR_W)
@@ -171,11 +171,11 @@ master_to_master
     (
         .valid_in(b_to_a_valid_in),
         .data_in(b_rdata),
-        .ready_in(b_ready),
+        .ready_in(b_ready & (direction == `B_TO_A)),
 
         .valid_out(b_to_a_valid_out),
         .data_out(a_wdata),
-        .ready_out(a_ready),
+        .ready_out(a_ready & (direction == `B_TO_A)),
 
         .start(run & (direction == `B_TO_A)),
         .last(last),
@@ -186,77 +186,77 @@ master_to_master
         .rst(rst)
     );
 
-assign a_valid = ((direction == `A_TO_B) ? a_to_b_valid_in  : b_to_a_valid_out);
-assign b_valid = ((direction == `A_TO_B) ? a_to_b_valid_out : b_to_a_valid_in);
+    assign a_valid = ((direction == `A_TO_B) ? a_to_b_valid_in  : b_to_a_valid_out);
+    assign b_valid = ((direction == `A_TO_B) ? a_to_b_valid_out : b_to_a_valid_in);
 
-wire read_valid = ((direction == `A_TO_B) ? a_valid : b_valid);
-wire read_ready = ((direction == `A_TO_B) ? a_ready : b_ready);
+    wire read_valid = ((direction == `A_TO_B) ? a_valid : b_valid);
+    wire read_ready = ((direction == `A_TO_B) ? a_ready : b_ready);
 
-wire write_valid = ((direction == `A_TO_B) ? b_valid : a_valid);
-wire write_ready = ((direction == `A_TO_B) ? b_ready : a_ready);
+    wire write_valid = ((direction == `A_TO_B) ? b_valid : a_valid);
+    wire write_ready = ((direction == `A_TO_B) ? b_ready : a_ready);
 
-wire [ADDR_W-1:0] read_addr;
-wire [ADDR_W-1:0] write_addr;
-wire [DATA_W/8-1:0] write_wstrb;
+    wire [ADDR_W-1:0] read_addr;
+    wire [ADDR_W-1:0] write_addr;
+    wire [DATA_W/8-1:0] write_wstrb;
 
-wire [ADDR_W-1:0] read_addr_start = ((direction == `A_TO_B) ? a_addr : b_addr);
-wire [ADDR_W-1:0] write_addr_start = ((direction == `A_TO_B) ? b_addr : a_addr);
+    wire [ADDR_W-1:0] read_addr_start = ((direction == `A_TO_B) ? address_a : address_b);
+    wire [ADDR_W-1:0] write_addr_start = ((direction == `A_TO_B) ? address_b : address_a);
 
-master_to_master_address_strobe_gen
-    #(
-        .DATA_W(DATA_W),
-        .ADDR_W(ADDR_W)
-    )
-    address_gen
-    (
-        .read_addr_start(read_addr_start),
-        .write_addr_start(write_addr_start),
+    master_to_master_address_strobe_gen
+        #(
+            .DATA_W(DATA_W),
+            .ADDR_W(ADDR_W)
+        )
+        address_gen
+        (
+            .read_addr_start(read_addr_start),
+            .write_addr_start(write_addr_start),
 
-        .read_valid(read_valid),
-        .read_ready(read_ready),
-        .read_addr(read_addr),
+            .read_valid(read_valid),
+            .read_ready(read_ready),
+            .read_addr(read_addr),
 
-        .write_valid(write_valid),
-        .write_ready(write_ready),
-        .write_addr(write_addr),
-        .write_wstrb(write_wstrb),
+            .write_valid(write_valid),
+            .write_ready(write_ready),
+            .write_addr(write_addr),
+            .write_wstrb(write_wstrb),
 
-        .start(run),
+            .start(run),
 
+            .clk(clk),
+            .rst(rst)
+        );
+
+    assign a_addr = ((direction == `A_TO_B) ? read_addr : write_addr);
+    assign b_addr = ((direction == `A_TO_B) ? write_addr : read_addr);
+
+    assign a_wstrb = ((direction == `A_TO_B) ? 4'h0 : write_wstrb);
+    assign b_wstrb = ((direction == `A_TO_B) ? write_wstrb : 4'h0);
+
+    /*
+    iob_sync_fifo
+      #(
+        .ADDRESS_WIDTH(2),
+        .DATA_WIDTH(32)
+        )
+      write_buffer
+        (
+        .rst(rst),
         .clk(clk),
-        .rst(rst)
-    );
+       
+        .fifo_ocupancy(fifo_ocupancy), 
 
-assign a_addr = ((direction == `A_TO_B) ? read_addr : write_addr);
-assign b_addr = ((direction == `A_TO_B) ? write_addr : read_addr);
+        //write port     
+        .w_data(in_rdata), 
+        .full(write_full),
+        .write_en(in_ready),
 
-assign a_wstrb = ((direction == `A_TO_B) ? 4'h0 : write_wstrb);
-assign b_wstrb = ((direction == `A_TO_B) ? write_wstrb : 4'h0);
-
-/*
-iob_sync_fifo
-  #(
-    .ADDRESS_WIDTH(2),
-    .DATA_WIDTH(32)
-    )
-  write_buffer
-    (
-    .rst(rst),
-    .clk(clk),
-   
-    .fifo_ocupancy(fifo_ocupancy), 
-
-    //write port     
-    .w_data(in_rdata), 
-    .full(write_full),
-    .write_en(in_ready),
-
-    //read port
-    .r_data(wr_data),
-    .empty(write_empty),
-    .read_en(wr_read_en)
-    );
-*/
+        //read port
+        .r_data(wr_data),
+        .empty(write_empty),
+        .read_en(wr_read_en)
+        );
+    */
 
 endmodule
 
@@ -295,9 +295,9 @@ reg last_valid_out;
 reg runningRead;
 reg runningWrite;
 
-assign running = (runningRead | runningWrite);
+reg data_valid_from_stored;
 
-wire store_on_data = (1'b1);
+assign running = (runningRead | runningWrite);
 
 always @(posedge clk,posedge rst)
 begin
@@ -306,6 +306,7 @@ begin
         data_valid <= 0;
         stored_data <= 0;
         stored_data_valid <= 0;
+        data_valid_from_stored <= 0;
 
         last_valid_in <= 0;
         last_valid_out <= 0;
@@ -318,27 +319,49 @@ begin
             runningWrite <= 1'b1;
         end
 
-        if(runningRead) begin
-            if(ready_in) begin
+        data_valid_from_stored <= 0;
 
-                if(store_on_data) begin
-                    data <= data_in;
-                    data_valid <= 1'b1;
-                end else begin
-                    stored_data <= data_in;
-                    stored_data_valid <= 1'b1;
-                end
-                
-                if(last)
-                    runningRead <= 1'b0;
-            end
+        // Data valid set
+        if(ready_in & ready_out & !stored_data_valid) begin
+            data <= data_in;
+            data_valid <= 1'b1;
+        end
+        if(ready_in & !stored_data_valid & !data_valid) begin
+            data <= data_in;
+            data_valid <= 1'b1;
+        end
+
+        // Data valid set from stored
+        if(stored_data_valid & data_valid & ready_out) begin
+            data <= stored_data;
+            data_valid <= 1'b1;
+            data_valid_from_stored <= 1'b1;
+        end
+
+        // Data stored set
+        if(stored_data_valid & data_valid & ready_in) begin
+            stored_data <= data_in;
+            stored_data_valid <= 1'b1;
+        end
+        if(data_valid & ready_in & !ready_out) begin
+            stored_data <= data_in;
+            stored_data_valid <= 1'b1;                
+        end
+
+        // Data valid unset
+        if(data_valid & !ready_in & ready_out & !stored_data_valid)
+            data_valid <= 1'b0;
+
+        // Data stored unset
+        if(stored_data_valid & data_valid & !ready_in & ready_out)
+            stored_data_valid <= 1'b0;
+
+        if(runningRead) begin
+            if(ready_in & last)
+                runningRead <= 1'b0;
         end
 
         if(runningWrite) begin
-            if(ready_out) begin
-                data_valid <= 1'b0;
-            end
-
             if(!runningRead & !data_valid & !stored_data_valid)
                 runningWrite <= 1'b0;
         end
@@ -348,22 +371,42 @@ end
 always @*
 begin
     valid_in = 1'b0;
-    
-    data_out = data;
     valid_out = 1'b0;
+    data_out = data; // Default data out (most likely to occur)
 
-    if(runningRead & !data_valid) begin
-        if(ready_in)
-            valid_in = 1'b0;
-        else
+    // Valid in
+    if(runningRead) begin
+        if(!stored_data_valid & !data_valid)
             valid_in = 1'b1;
+        if(ready_out)
+            valid_in = 1'b1;
+        if(!ready_in & !stored_data_valid)
+            valid_in = 1'b1;
+
+        if(ready_in & last)
+            valid_in = 1'b0;
+
+    end else begin
+        valid_in = 1'b0;
     end
 
-    if(runningWrite & data_valid) begin
-        if(ready_out)
-            valid_out = 1'b0;
-        else
+    if(runningWrite) begin
+        if(ready_in & ready_out & !stored_data_valid)
+            data_out = data_in;
+        if(ready_in & !stored_data_valid & !data_valid)
+            data_out = data_in;
+
+        if(stored_data_valid & data_valid & !ready_in & ready_out)
+            data_out = stored_data;
+
+        if(ready_in)
             valid_out = 1'b1;
+        if(stored_data_valid)
+            valid_out = 1'b1;
+        if(data_valid & !ready_out)
+            valid_out = 1'b1;
+    end else begin
+        valid_out = 1'b0;
     end
 end
 
