@@ -3,7 +3,6 @@
 #
 
 SIM_DIR=./hardware/simulation/icarus
-DMA_SRC_DIR=./hardware/src
 
 #
 # SIMULATE
