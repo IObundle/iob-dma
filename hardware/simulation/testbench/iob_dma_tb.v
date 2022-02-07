@@ -125,8 +125,8 @@ integer i;
 
 reg [31:0] tests_made;
 integer v1,v2,v3,v4,v5,v6,v7,v8;
+   
    initial begin
-
 `ifdef VCD
       $dumpfile("uut.vcd");
       $dumpvars();
@@ -253,8 +253,8 @@ integer v1,v2,v3,v4,v5,v6,v7,v8;
       begin
          tests_made = tests_made + 1;
 
-         set_c_value(0,(a_addr + 1) * 4); // Address A
-         set_c_value(1,(b_addr + 1) * 4); // Address B
+         set_c_value(0,(a_addr + 1) * 4); // Address A (plus 1 due to canary value)
+         set_c_value(1,(b_addr + 1) * 4); // Address B (plus 1 due to canary value)
          set_c_value(2,n_values * 4); // Bytes length
          set_c_value(3,direction); // Write
          set_c_value(4,1); // Run

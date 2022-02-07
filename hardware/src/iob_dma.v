@@ -5,7 +5,7 @@
 
 `define ADDRESS_A 0
 `define ADDRESS_B 1
-`define LENGTH 2    // In bytes, 0 is not valid and will  
+`define LENGTH 2    // In bytes, 0 is not valid and will cause malfunction
 `define DIRECTION 3
 `define RUN 4
 
