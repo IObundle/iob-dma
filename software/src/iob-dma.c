@@ -7,6 +7,11 @@ void dma_init(int base_address){
   IOB_DMA_INIT_BASEADDR(base_address);
 }
 
+void dma_rst(){
+  IOB_DMA_SET_SOFT_RESET(1);
+  IOB_DMA_SET_SOFT_RESET(0);
+}
+
 // Start a DMA transfer
 // base_addr: Base address of external memory to start the data transfer.
 // size: Amount of 32-bit words to transfer.

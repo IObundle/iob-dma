@@ -195,6 +195,15 @@ class iob_dma(iob_module):
         cls.regs += [
             {'name': 'dma', 'descr':'DMA software accessible registers.', 'regs': [
                 {
+                    "name": "SOFT_RESET",
+                    "type": "W",
+                    "n_bits": 1,
+                    "rst_val": 0,
+                    "log2n_items": 0,
+                    "autoreg": True,
+                    "descr": "Software reset. Writing 1 will reset the DMA module. Needs to be set back to 0.",
+                },
+                {
                     "name": "BASE_ADDR",
                     "type": "W",
                     "n_bits": 32,
