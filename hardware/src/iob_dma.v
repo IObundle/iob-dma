@@ -96,8 +96,10 @@ module iob_dma #(
       .data_o(axis_out_ready)
    );
 
-   wire BASE_ADDR_wen_wr = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & iob_addr_i==`IOB_DMA_BASE_ADDR_ADDR);
-   wire TRANSFER_SIZE_wen_wr = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & iob_addr_i==`IOB_DMA_TRANSFER_SIZE_ADDR);
+   wire BASE_ADDR_wen_wr;
+   assign BASE_ADDR_wen_wr = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & iob_addr_i==`IOB_DMA_BASE_ADDR_ADDR);
+   wire TRANSFER_SIZE_wen_wr;
+   assign TRANSFER_SIZE_wen_wr = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & iob_addr_i==`IOB_DMA_TRANSFER_SIZE_ADDR);
 
    // Create a 1 clock pulse when new value is written to BASE_ADDR
    reg base_addr_wen_delay_1;
@@ -111,7 +113,8 @@ module iob_dma #(
          base_addr_wen_delay_2 <= base_addr_wen_delay_1;
       end
    end
-   wire base_addr_wen_pulse = base_addr_wen_delay_1 && ~base_addr_wen_delay_2;
+   wire base_addr_wen_pulse;
+   assign base_addr_wen_pulse = base_addr_wen_delay_1 && ~base_addr_wen_delay_2;
 
    // Create a 1 clock pulse when new value is written to TRANSFER_SIZE
    reg  transfer_size_wen_delay_1;
@@ -125,7 +128,8 @@ module iob_dma #(
          transfer_size_wen_delay_2 <= transfer_size_wen_delay_1;
       end
    end
-   wire          transfer_size_wen_pulse = transfer_size_wen_delay_1 && ~transfer_size_wen_delay_2;
+   wire transfer_size_wen_pulse;
+   assign transfer_size_wen_pulse = transfer_size_wen_delay_1 && ~transfer_size_wen_delay_2;
 
    wire [32-1:0] receive_transfer_size;
    iob_reg_re #(
