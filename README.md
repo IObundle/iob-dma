@@ -10,7 +10,9 @@ This repository contains the hardware module, software driver, and integration s
 ## Overview
 
 `iob-dma` moves data from an AXI-full source address range to an AXI-full destination address range under software control.
-Software configures source/destination addresses, transfer length, and burst length through the control registers, then starts source-to-destination DMA operations.
+Software configures source/destination addresses, transfer length, burst length, and source/destination burst types through the control registers, then starts source-to-destination DMA operations.
+
+Supported burst types are `DMA_BURST_TYPE_FIXED` (0) and `DMA_BURST_TYPE_INCR` (1) for both source and destination paths.
 
 ## DMA Operation
 
@@ -23,7 +25,8 @@ Example programming sequence:
 
 ```c
 dma_init(DMA_BASEADDR);
-dma_start_transfer(src_addr, dst_addr, length_words, burstlen_words);
+dma_start_transfer(src_addr, dst_addr, length_words, burstlen_words,
+				   DMA_BURST_TYPE_INCR, DMA_BURST_TYPE_FIXED);
 while (dma_busy()) {
 	// wait
 }
@@ -43,17 +46,19 @@ while (dma_busy()) {
 
 ## Register-Level Control
 
-The DMA exposes source and destination address registers, while transfer control/status fields use the same semantics for both paths:
+The DMA exposes source and destination address/burst-type registers, plus shared transfer control/status fields:
 
 - Source address: `src_addr`
 - Destination address: `dst_addr`
+- Source transfer fields: `src_addr`, `src_burst_type`
+- Destination transfer fields: `dst_addr`, `dst_burst_type`
 - Shared transfer fields: `length`, `burstlen`, `start`, `busy`, `buf_level`
 - `soft_reset`
 
 Typical sequence:
 
 1. Program `src_addr` and `dst_addr`.
-2. Program `length` and `burstlen`.
+2. Program `length`, `burstlen`, `src_burst_type`, and `dst_burst_type`.
 3. Trigger `start`.
 4. Poll `busy` until transfer completes.
 
@@ -72,7 +77,9 @@ Exposed helper functions:
 
 ```c
 void dma_init(int base_address);
-void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr, uint32_t length, uint32_t burstlen);
+void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr,
+						uint32_t length, uint32_t burstlen,
+						uint32_t src_burst_type, uint32_t dst_burst_type);
 uint8_t dma_busy();
 ```
 
