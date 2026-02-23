@@ -9,8 +9,20 @@ from iob_axi_m import iob_axi_m
 from iob_ram_2p import iob_ram_2p
 
 class iob_dma(iob_module):
+    """IObundle DMA module.
+
+    Supported features:
+    - AXI manager source-to-destination DMA transfers.
+    - AXI-Lite subordinate CSR control interface.
+    - Configurable transfer length and burst length.
+    - Independent source and destination burst type selection.
+    - Supported burst types: FIXED (0) and INCR (1).
+    - Software-triggered transfer start and soft reset.
+    - Transfer status reporting through busy and buf_level.
+    """
+
     name = "iob_dma"
-    version = "V0.20"
+    version = "V0.30"
     flows = "sim emb"
     setup_dir = os.path.dirname(__file__)
 
@@ -205,6 +217,24 @@ class iob_dma(iob_module):
                         "log2n_items": 0,
                         "autoreg": True,
                         "descr": "AXI burst length for transfers.",
+                    },
+                    {
+                        "name": "src_burst_type",
+                        "type": "W",
+                        "n_bits": 2,
+                        "rst_val": 1,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "AXI source burst type for transfers (FIXED=0, INCR=1).",
+                    },
+                    {
+                        "name": "dst_burst_type",
+                        "type": "W",
+                        "n_bits": 2,
+                        "rst_val": 1,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "AXI destination burst type for transfers (FIXED=0, INCR=1).",
                     },
                     {
                         "name": "buf_level",
