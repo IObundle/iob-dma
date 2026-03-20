@@ -82,7 +82,7 @@ class iob_dma(iob_module):
                 },
                 {
                     "name": "AXI_DATA_W",
-                    "type": "P",
+                    "type": "F",
                     "val": "DATA_W",
                     "min": "1",
                     "max": "32",
@@ -91,9 +91,9 @@ class iob_dma(iob_module):
                 {
                     "name": "AXI_ID_W",
                     "type": "P",
-                    "val": "1",
-                    "min": "NA",
-                    "max": "NA",
+                    "val": "4",
+                    "min": "1",
+                    "max": "8",
                     "descr": "AXI ID width",
                 },
                 {
@@ -110,7 +110,7 @@ class iob_dma(iob_module):
     @classmethod
     def _setup_ios(cls):
         cls.ios += [
-            {"name": "axil_s_port", "descr": "AXI-Lite subordinate CSRs interface", "ports": []},
+            {"name": "iob_s_port", "descr": "CPU native interface", "ports": []},
             {
                 "name": "general",
                 "descr": "General system signals",
