@@ -183,7 +183,7 @@ class iob_dma(iob_module):
                         "descr": "Destination start address.",
                     },
                     {
-                        "name": "length",
+                        "name": "transf_length",
                         "type": "W",
                         "n_bits": "LENGTH_W",
                         "rst_val": 0,

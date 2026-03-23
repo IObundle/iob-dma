@@ -25,7 +25,7 @@ Example programming sequence:
 
 ```c
 dma_init(DMA_BASEADDR);
-dma_start_transfer(src_addr, dst_addr, length_words, burstlen_words,
+dma_start_transfer(src_addr, dst_addr, transf_length_words, burstlen_words,
 				   DMA_BURST_TYPE_INCR, DMA_BURST_TYPE_FIXED);
 while (dma_busy()) {
 	// wait
@@ -52,13 +52,13 @@ The DMA exposes source and destination address/burst-type registers, plus shared
 - Destination address: `dst_addr`
 - Source transfer fields: `src_addr`, `src_burst_type`
 - Destination transfer fields: `dst_addr`, `dst_burst_type`
-- Shared transfer fields: `length`, `burstlen`, `start`, `busy`, `buf_level`
+- Shared transfer fields: `transf_length`, `burstlen`, `start`, `busy`, `buf_level`
 - `soft_reset`
 
 Typical sequence:
 
 1. Program `src_addr` and `dst_addr`.
-2. Program `length`, `burstlen`, `src_burst_type`, and `dst_burst_type`.
+2. Program `transf_length`, `burstlen`, `src_burst_type`, and `dst_burst_type`.
 3. Trigger `start`.
 4. Poll `busy` until transfer completes.
 
@@ -78,7 +78,7 @@ Exposed helper functions:
 ```c
 void dma_init(int base_address);
 void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr,
-						uint32_t length, uint32_t burstlen,
+						uint32_t transf_length, uint32_t burstlen,
 						uint32_t src_burst_type, uint32_t dst_burst_type);
 uint8_t dma_busy();
 ```

@@ -47,7 +47,8 @@ module iob_dma #(
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_ID_W  (AXI_ID_W),
       .WLENGTH_W(LENGTH_W),
-      .RLENGTH_W(LENGTH_W)
+      .RLENGTH_W(LENGTH_W),
+      .FIFO_ADDR_W(AXI_LEN_W)
    ) axi_m_inst (
       `include "clk_en_rst_s_s_portmap.vs"
       .rst_i(soft_reset_wen_wr),
@@ -79,7 +80,6 @@ module iob_dma #(
       .axis_out_valid_o(dma_valid),
       .axis_out_ready_i(dma_ready),
 
-      .w_ext_mem_clk_o   (write_fifo_mem_clk),
       .w_ext_mem_w_en_o  (write_fifo_mem_w_en),
       .w_ext_mem_w_addr_o(write_fifo_mem_w_addr),
       .w_ext_mem_w_data_o(write_fifo_mem_w_data),
@@ -87,7 +87,6 @@ module iob_dma #(
       .w_ext_mem_r_addr_o(write_fifo_mem_r_addr),
       .w_ext_mem_r_data_i(write_fifo_mem_r_data),
 
-      .r_ext_mem_clk_o   (read_fifo_mem_clk),
       .r_ext_mem_w_en_o  (read_fifo_mem_w_en),
       .r_ext_mem_w_addr_o(read_fifo_mem_w_addr),
       .r_ext_mem_w_data_o(read_fifo_mem_w_data),
@@ -102,7 +101,7 @@ module iob_dma #(
       .DATA_W(AXI_DATA_W),
       .ADDR_W(AXI_LEN_W)
    ) w_ext_memory (
-      .clk_i   (write_fifo_mem_clk),
+      .clk_i   (clk_i),
       .w_en_i  (write_fifo_mem_w_en),
       .w_data_i(write_fifo_mem_w_data),
       .w_addr_i(write_fifo_mem_w_addr),
@@ -115,7 +114,7 @@ module iob_dma #(
       .DATA_W(AXI_DATA_W),
       .ADDR_W(AXI_LEN_W)
    ) r_ext_memory (
-      .clk_i   (read_fifo_mem_clk),
+      .clk_i   (clk_i),
       .w_en_i  (read_fifo_mem_w_en),
       .w_data_i(read_fifo_mem_w_data),
       .w_addr_i(read_fifo_mem_w_addr),
