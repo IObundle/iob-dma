@@ -166,7 +166,7 @@ class iob_dma(iob_module):
                 "regs": [
                     {
                         "name": "src_addr",
-                        "type": "W",
+                        "type": "RW",
                         "n_bits": "AXI_ADDR_W",
                         "rst_val": 0,
                         "log2n_items": 0,
@@ -175,7 +175,7 @@ class iob_dma(iob_module):
                     },
                     {
                         "name": "dst_addr",
-                        "type": "W",
+                        "type": "RW",
                         "n_bits": "AXI_ADDR_W",
                         "rst_val": 0,
                         "log2n_items": 0,
@@ -184,7 +184,7 @@ class iob_dma(iob_module):
                     },
                     {
                         "name": "transf_length",
-                        "type": "W",
+                        "type": "RW",
                         "n_bits": "LENGTH_W",
                         "rst_val": 0,
                         "log2n_items": 0,
@@ -211,7 +211,7 @@ class iob_dma(iob_module):
                     },
                     {
                         "name": "burstlen",
-                        "type": "W",
+                        "type": "RW",
                         "n_bits": "(AXI_LEN_W+1)",
                         "rst_val": 16,
                         "log2n_items": 0,
@@ -220,7 +220,7 @@ class iob_dma(iob_module):
                     },
                     {
                         "name": "src_burst_type",
-                        "type": "W",
+                        "type": "RW",
                         "n_bits": 2,
                         "rst_val": 1,
                         "log2n_items": 0,
@@ -229,7 +229,7 @@ class iob_dma(iob_module):
                     },
                     {
                         "name": "dst_burst_type",
-                        "type": "W",
+                        "type": "RW",
                         "n_bits": 2,
                         "rst_val": 1,
                         "log2n_items": 0,
