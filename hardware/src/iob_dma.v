@@ -13,7 +13,6 @@ module iob_dma #(
    `include "iob_dma_swreg_inst.vs"
 
    // External memory interfaces
-   wire                  write_fifo_mem_clk;
    wire                  write_fifo_mem_w_en;
    wire [ AXI_LEN_W-1:0] write_fifo_mem_w_addr;
    wire [AXI_DATA_W-1:0] write_fifo_mem_w_data;
@@ -21,7 +20,6 @@ module iob_dma #(
    wire [ AXI_LEN_W-1:0] write_fifo_mem_r_addr;
    wire [AXI_DATA_W-1:0] write_fifo_mem_r_data;
 
-   wire                  read_fifo_mem_clk;
    wire                  read_fifo_mem_w_en;
    wire [ AXI_LEN_W-1:0] read_fifo_mem_w_addr;
    wire [AXI_DATA_W-1:0] read_fifo_mem_w_data;
@@ -31,7 +29,6 @@ module iob_dma #(
 
    wire                  dst_busy;
    wire                  src_busy;
-   wire [LENGTH_W-1:0]   dst_buf_level;
 
    wire [AXI_DATA_W-1:0] dma_data;
    wire                  dma_valid;
@@ -55,7 +52,7 @@ module iob_dma #(
 
       // AXI manager destination path
       .w_addr_i          (dst_addr_wr),
-      .w_length_i        (length_wr),
+      .w_length_i        (transf_length_wr),
       .w_start_transfer_i(start_wen_wr),
       .w_max_len_i       (burstlen_wr),
       .w_burst_type_i    (dst_burst_type_wr),
@@ -64,7 +61,7 @@ module iob_dma #(
 
       // AXI manager source path
       .r_addr_i          (src_addr_wr),
-      .r_length_i        (length_wr),
+      .r_length_i        (transf_length_wr),
       .r_start_transfer_i(start_wen_wr),
       .r_max_len_i       (burstlen_wr),
       .r_burst_type_i    (src_burst_type_wr),
