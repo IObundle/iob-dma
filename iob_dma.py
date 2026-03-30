@@ -5,7 +5,7 @@ import os
 from iob_module import iob_module
 
 # Submodules
-from iob_axi_m import iob_axi_m
+from iob_axi_m_dma import iob_axi_m_dma
 from iob_ram_2p import iob_ram_2p
 
 class iob_dma(iob_module):
@@ -37,7 +37,7 @@ class iob_dma(iob_module):
                 {"interface": "iob_s_portmap"},
                 {"interface": "axi_m_port"},
                 {"interface": "axi_m_m_portmap"},
-                iob_axi_m,
+                iob_axi_m_dma,
                 iob_ram_2p,
             ]
         )
@@ -139,6 +139,36 @@ class iob_dma(iob_module):
                 "name": "axi_m_port",
                 "descr": "AXI manager interface for external memory.",
                 "ports": [],
+            },
+            {
+                "name": "dma_if",
+                "descr": "DMA handshake interfaces (DMAC side).",
+                "ports": [
+                    {
+                        "name": "w_dma_req_i",
+                        "type": "I",
+                        "n_bits": "1",
+                        "descr": "Write-path DMA request input.",
+                    },
+                    {
+                        "name": "w_dma_ack_o",
+                        "type": "O",
+                        "n_bits": "1",
+                        "descr": "Write-path DMA acknowledge output.",
+                    },
+                    {
+                        "name": "r_dma_req_i",
+                        "type": "I",
+                        "n_bits": "1",
+                        "descr": "Read-path DMA request input.",
+                    },
+                    {
+                        "name": "r_dma_ack_o",
+                        "type": "O",
+                        "n_bits": "1",
+                        "descr": "Read-path DMA acknowledge output.",
+                    },
+                ],
             },
         ]
 
@@ -244,6 +274,42 @@ class iob_dma(iob_module):
                         "log2n_items": 0,
                         "autoreg": True,
                         "descr": "Number of words left in the current DMA transfer.",
+                    },
+                    {
+                        "name": "w_dma_req_en",
+                        "type": "RW",
+                        "n_bits": 1,
+                        "rst_val": 1,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "Enable write DMA request/ack handshake driven transfers.",
+                    },
+                    {
+                        "name": "r_dma_req_en",
+                        "type": "RW",
+                        "n_bits": 1,
+                        "rst_val": 1,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "Enable read DMA request/ack handshake driven transfers.",
+                    },
+                    {
+                        "name": "w_dma_req_pending",
+                        "type": "R",
+                        "n_bits": 1,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "Write DMA request pending status: high when a write DMA request is active and waiting for acknowledgment.",
+                    },
+                    {
+                        "name": "r_dma_req_pending",
+                        "type": "R",
+                        "n_bits": 1,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "Read DMA request pending status: high when a read DMA request is active and waiting for acknowledgment.",
                     },
                 ],
             },

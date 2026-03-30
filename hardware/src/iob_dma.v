@@ -29,44 +29,61 @@ module iob_dma #(
 
    wire                  dst_busy;
    wire                  src_busy;
+   wire                  w_dma_req_pending;
+   wire                  w_dma_ack;
+   wire                  r_dma_req_pending;
+   wire                  r_dma_ack;
 
    wire [AXI_DATA_W-1:0] dma_data;
    wire                  dma_valid;
    wire                  dma_ready;
 
-   assign soft_reset_ready_wr = 1'b1;
-   assign start_ready_wr      = 1'b1;
-   assign busy_rd             = src_busy | dst_busy;
+   assign soft_reset_ready_wr  = 1'b1;
+   assign start_ready_wr       = 1'b1;
+   assign busy_rd              = src_busy | dst_busy;
+   assign w_dma_req_pending_rd = w_dma_req_pending;
+   assign r_dma_req_pending_rd = r_dma_req_pending;
 
-   iob_axi_m #(
-      .AXI_ADDR_W(AXI_ADDR_W),
-      .AXI_LEN_W (AXI_LEN_W),
-      .AXI_DATA_W(AXI_DATA_W),
-      .AXI_ID_W  (AXI_ID_W),
-      .WLENGTH_W(LENGTH_W),
-      .RLENGTH_W(LENGTH_W),
+   assign w_dma_ack_o          = w_dma_ack;
+   assign r_dma_ack_o          = r_dma_ack;
+
+   iob_axi_m_dma #(
+      .AXI_ADDR_W (AXI_ADDR_W),
+      .AXI_LEN_W  (AXI_LEN_W),
+      .AXI_DATA_W (AXI_DATA_W),
+      .AXI_ID_W   (AXI_ID_W),
+      .WLENGTH_W  (LENGTH_W),
+      .RLENGTH_W  (LENGTH_W),
       .FIFO_ADDR_W(AXI_LEN_W)
    ) axi_m_inst (
       `include "clk_en_rst_s_s_portmap.vs"
       .rst_i(soft_reset_wen_wr),
 
       // AXI manager destination path
-      .w_addr_i          (dst_addr_wr),
-      .w_length_i        (transf_length_wr),
-      .w_start_transfer_i(start_wen_wr),
-      .w_max_len_i       (burstlen_wr),
-      .w_burst_type_i    (dst_burst_type_wr),
-      .w_remaining_data_o(buf_level_rd),
-      .w_busy_o          (dst_busy),
+      .w_addr_i           (dst_addr_wr),
+      .w_length_i         (transf_length_wr),
+      .w_start_transfer_i (start_wen_wr),
+      .w_dma_req_en_i     (w_dma_req_en_wr),
+      .w_dma_req_i        (w_dma_req_i),
+      .w_dma_req_pending_o(w_dma_req_pending),
+      .w_dma_ack_o        (w_dma_ack),
+      .w_max_len_i        (burstlen_wr),
+      .w_burst_type_i     (dst_burst_type_wr),
+      .w_remaining_data_o (buf_level_rd),
+      .w_busy_o           (dst_busy),
 
       // AXI manager source path
-      .r_addr_i          (src_addr_wr),
-      .r_length_i        (transf_length_wr),
-      .r_start_transfer_i(start_wen_wr),
-      .r_max_len_i       (burstlen_wr),
-      .r_burst_type_i    (src_burst_type_wr),
-      .r_remaining_data_o(),
-      .r_busy_o          (src_busy),
+      .r_addr_i           (src_addr_wr),
+      .r_length_i         (transf_length_wr),
+      .r_start_transfer_i (start_wen_wr),
+      .r_dma_req_en_i     (r_dma_req_en_wr),
+      .r_dma_req_i        (r_dma_req_i),
+      .r_dma_req_pending_o(r_dma_req_pending),
+      .r_dma_ack_o        (r_dma_ack),
+      .r_max_len_i        (burstlen_wr),
+      .r_burst_type_i     (src_burst_type_wr),
+      .r_remaining_data_o (),
+      .r_busy_o           (src_busy),
 
       // Internal data path: source read stream to destination write stream
       .axis_in_data_i (dma_data),
