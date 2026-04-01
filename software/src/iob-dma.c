@@ -8,7 +8,9 @@ void dma_init(int base_address){
 }
 
 // Start a DMA transfer from source to destination.
-void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr, uint32_t transf_length, uint32_t burst_len, uint32_t src_burst_type, uint32_t dst_burst_type){
+void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr, uint32_t transf_length, 
+                        uint32_t burst_len, uint32_t src_burst_type, uint32_t dst_burst_type, 
+                        uint8_t src_dma_req_en, uint8_t dst_dma_req_en){
   src_burst_type = (src_burst_type == DMA_BURST_TYPE_FIXED) ? DMA_BURST_TYPE_FIXED : DMA_BURST_TYPE_INCR;
   dst_burst_type = (dst_burst_type == DMA_BURST_TYPE_FIXED) ? DMA_BURST_TYPE_FIXED : DMA_BURST_TYPE_INCR;
   IOB_DMA_SET_src_addr((uint32_t)src_addr);
@@ -17,6 +19,8 @@ void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr, uint32_t transf_
   IOB_DMA_SET_burstlen(burst_len);
   IOB_DMA_SET_src_burst_type(src_burst_type);
   IOB_DMA_SET_dst_burst_type(dst_burst_type);
+  IOB_DMA_SET_r_dma_req_en(src_dma_req_en);
+  IOB_DMA_SET_w_dma_req_en(dst_dma_req_en);
   IOB_DMA_SET_start(1);
 }
 
