@@ -16,7 +16,7 @@ void dma_init(int base_address);
 // Start a DMA source-to-destination transfer
 void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr,
                         uint32_t transf_length, uint32_t burst_len,
-                        uint32_t src_burst_type, uint32_t dst_burst_type
+                        uint32_t src_burst_type, uint32_t dst_burst_type,
                         uint8_t src_dma_req_en, uint8_t dst_dma_req_en);
 
 // Check if DMA is busy
