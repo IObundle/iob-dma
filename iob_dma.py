@@ -327,7 +327,7 @@ class iob_dma(iob_module):
                         "rst_val": 0,
                         "log2n_items": 0,
                         "autoreg": False,
-                        "descr": "Sticky AXI read response: holds the last non-OKAY code until r_resp_clear is written.",
+                        "descr": "Sticky AXI read response: latches the first non-OKAY code and keeps it until r_resp_clear is written.",
                     },
                     {
                         "name": "r_resp_clear",
@@ -345,7 +345,7 @@ class iob_dma(iob_module):
                         "rst_val": 0,
                         "log2n_items": 0,
                         "autoreg": False,
-                        "descr": "Sticky AXI write response: holds the last non-OKAY code until w_resp_clear is written.",
+                        "descr": "Sticky AXI write response: latches the first non-OKAY code and keeps it until w_resp_clear is written.",
                     },
                     {
                         "name": "w_resp_clear",
