@@ -6,7 +6,9 @@ from iob_module import iob_module
 
 # Submodules
 from iob_axi_m_dma import iob_axi_m_dma
+from iob_reg_r import iob_reg_r
 from iob_ram_2p import iob_ram_2p
+
 
 class iob_dma(iob_module):
     """IObundle DMA module.
@@ -38,6 +40,7 @@ class iob_dma(iob_module):
                 {"interface": "axi_m_port"},
                 {"interface": "axi_m_m_portmap"},
                 iob_axi_m_dma,
+                iob_reg_r,
                 iob_ram_2p,
             ]
         )
@@ -310,6 +313,48 @@ class iob_dma(iob_module):
                         "log2n_items": 0,
                         "autoreg": True,
                         "descr": "Read DMA request pending status: high when a read DMA request is active and waiting for acknowledgment.",
+                    },
+                ],
+            },
+            {
+                "name": "response_status",
+                "descr": "AXI response status sticky registers.",
+                "regs": [
+                    {
+                        "name": "r_resp",
+                        "type": "R",
+                        "n_bits": 2,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": False,
+                        "descr": "Sticky AXI read response: holds the last non-OKAY code until r_resp_clear is written.",
+                    },
+                    {
+                        "name": "r_resp_clear",
+                        "type": "W",
+                        "n_bits": 1,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": False,
+                        "descr": "Read response clear: writing any value clears the r_resp sticky register.",
+                    },
+                    {
+                        "name": "w_resp",
+                        "type": "R",
+                        "n_bits": 2,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": False,
+                        "descr": "Sticky AXI write response: holds the last non-OKAY code until w_resp_clear is written.",
+                    },
+                    {
+                        "name": "w_resp_clear",
+                        "type": "W",
+                        "n_bits": 1,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": False,
+                        "descr": "Write response clear: writing any value clears the w_resp sticky register.",
                     },
                 ],
             },

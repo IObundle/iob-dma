@@ -22,4 +22,12 @@ void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr,
 // Check if DMA is busy
 uint8_t dma_busy();
 
+// Get sticky AXI response status (OKAY=0, EXOKAY=1, SLVERR=2, DECERR=3)
+uint8_t dma_get_r_resp();
+uint8_t dma_get_w_resp();
+
+// Clear sticky AXI response status CSRs
+void dma_clear_r_resp();
+void dma_clear_w_resp();
+
 #endif //_IOB_DMA_H_
