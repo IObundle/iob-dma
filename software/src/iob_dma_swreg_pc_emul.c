@@ -16,3 +16,17 @@ void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr, uint32_t transf_
 uint8_t dma_busy(){
     return 0;
 }
+
+uint8_t dma_get_r_resp(){
+	return 0;
+}
+
+uint8_t dma_get_w_resp(){
+	return 0;
+}
+
+void dma_clear_r_resp(){
+}
+
+void dma_clear_w_resp(){
+}

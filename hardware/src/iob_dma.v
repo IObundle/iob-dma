@@ -47,6 +47,49 @@ module iob_dma #(
    assign w_dma_ack_o          = w_dma_ack;
    assign r_dma_ack_o          = r_dma_ack;
 
+   // AXI response sticky status
+   wire [2-1:0] r_resp_dma;
+   wire [2-1:0] w_resp_dma;
+   reg  [2-1:0] r_resp_nxt;
+   reg  [2-1:0] w_resp_nxt;
+
+   assign r_resp_clear_ready_wr = 1'b1;
+   assign w_resp_clear_ready_wr = 1'b1;
+
+   always @* begin
+      if (r_resp_dma != 2'b00) begin
+         r_resp_nxt = r_resp_dma;
+      end else begin
+         r_resp_nxt = r_resp_rd;
+      end
+
+      if (w_resp_dma != 2'b00) begin
+         w_resp_nxt = w_resp_dma;
+      end else begin
+         w_resp_nxt = w_resp_rd;
+      end
+   end
+
+   iob_reg_r #(
+      .DATA_W (2),
+      .RST_VAL(2'b00)
+   ) r_resp_reg (
+      `include "clk_en_rst_s_s_portmap.vs"
+      .rst_i (r_resp_clear_wen_wr),
+      .data_i(r_resp_nxt),
+      .data_o(r_resp_rd)
+   );
+
+   iob_reg_r #(
+      .DATA_W (2),
+      .RST_VAL(2'b00)
+   ) w_resp_reg (
+      `include "clk_en_rst_s_s_portmap.vs"
+      .rst_i (w_resp_clear_wen_wr),
+      .data_i(w_resp_nxt),
+      .data_o(w_resp_rd)
+   );
+
    iob_axi_m_dma #(
       .AXI_ADDR_W (AXI_ADDR_W),
       .AXI_LEN_W  (AXI_LEN_W),
@@ -71,6 +114,7 @@ module iob_dma #(
       .w_burst_type_i     (dst_burst_type_wr),
       .w_remaining_data_o (buf_level_rd),
       .w_busy_o           (dst_busy),
+      .w_resp_o           (w_resp_dma),
 
       // AXI manager source path
       .r_addr_i           (src_addr_wr),
@@ -84,6 +128,7 @@ module iob_dma #(
       .r_burst_type_i     (src_burst_type_wr),
       .r_remaining_data_o (),
       .r_busy_o           (src_busy),
+      .r_resp_o           (r_resp_dma),
 
       // Internal data path: source read stream to destination write stream
       .axis_in_data_i (dma_data),

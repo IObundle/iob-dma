@@ -29,3 +29,19 @@ uint8_t dma_busy(){
   return IOB_DMA_GET_busy();
 }
 
+uint8_t dma_get_r_resp(){
+  return (uint8_t)IOB_DMA_GET_r_resp();
+}
+
+uint8_t dma_get_w_resp(){
+  return (uint8_t)IOB_DMA_GET_w_resp();
+}
+
+void dma_clear_r_resp(){
+  IOB_DMA_SET_r_resp_clear(1);
+}
+
+void dma_clear_w_resp(){
+  IOB_DMA_SET_w_resp_clear(1);
+}
+
