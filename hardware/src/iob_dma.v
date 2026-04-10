@@ -57,13 +57,13 @@ module iob_dma #(
    assign w_resp_clear_ready_wr = 1'b1;
 
    always @* begin
-      if (r_resp_dma != 2'b00) begin
+      if ((r_resp_rd == 2'b00) && (r_resp_dma != 2'b00)) begin
          r_resp_nxt = r_resp_dma;
       end else begin
          r_resp_nxt = r_resp_rd;
       end
 
-      if (w_resp_dma != 2'b00) begin
+      if ((w_resp_rd == 2'b00) && (w_resp_dma != 2'b00)) begin
          w_resp_nxt = w_resp_dma;
       end else begin
          w_resp_nxt = w_resp_rd;
