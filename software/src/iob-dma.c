@@ -16,7 +16,7 @@ void dma_start_transfer(uint32_t *src_addr, uint32_t *dst_addr, uint32_t transf_
   IOB_DMA_SET_src_addr((uint32_t)src_addr);
   IOB_DMA_SET_dst_addr((uint32_t)dst_addr);
   IOB_DMA_SET_transf_length(transf_length);
-  IOB_DMA_SET_burstlen(burst_len);
+  IOB_DMA_SET_burstlen(burst_len-1);
   IOB_DMA_SET_src_burst_type(src_burst_type);
   IOB_DMA_SET_dst_burst_type(dst_burst_type);
   IOB_DMA_SET_r_dma_req_en(src_dma_req_en);

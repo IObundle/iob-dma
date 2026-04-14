@@ -245,11 +245,11 @@ class iob_dma(iob_module):
                     {
                         "name": "burstlen",
                         "type": "RW",
-                        "n_bits": "(AXI_LEN_W+1)",
+                        "n_bits": "AXI_LEN_W",
                         "rst_val": 16,
                         "log2n_items": 0,
                         "autoreg": True,
-                        "descr": "AXI burst length for transfers.",
+                        "descr": "AXI burst length for transfers minus one.",
                     },
                     {
                         "name": "src_burst_type",
@@ -326,7 +326,7 @@ class iob_dma(iob_module):
                         "n_bits": 2,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": False,
+                        "autoreg": True,
                         "descr": "Sticky AXI read response: latches the first non-OKAY code and keeps it until r_resp_clear is written.",
                     },
                     {
@@ -344,7 +344,7 @@ class iob_dma(iob_module):
                         "n_bits": 2,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": False,
+                        "autoreg": True,
                         "descr": "Sticky AXI write response: latches the first non-OKAY code and keeps it until w_resp_clear is written.",
                     },
                     {
